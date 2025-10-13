@@ -1,0 +1,2 @@
+[template]
+exclude = ["target", "Cargo.lock", "cliff.toml", ".git", ".env", "README.md"]
