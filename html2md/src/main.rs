@@ -1,25 +1,25 @@
 use std::fs;
-use structopt::StructOpt;
 
-#[derive(StructOpt, Debug)]
-#[structopt(name = "html2md")]
+use clap::Parser;
+
+#[derive(Parser, Debug)]
 struct Ops {
-    #[structopt(help = "input url", parse(try_from_str = url::Url::parse))]
+    #[arg(value_parser = url::Url::parse)]
     pub url: url::Url,
-    #[structopt(help = "output file", parse(from_str = md_suffix))]
+    #[arg(value_parser = md_suffix)]
     pub output: String,
 }
 
-fn md_suffix(file: &str) -> String {
+fn md_suffix(file: &str) -> anyhow::Result<String> {
     if file.ends_with(".md") {
-        file.to_string()
+        Ok(file.to_string())
     } else {
-        format!("{}.md", file)
+        Ok(format!("{}.md", file))
     }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let ops = Ops::from_args();
+    let ops = Ops::parse();
 
     println!("Fetching url {}", ops.url);
     let body = reqwest::blocking::get(ops.url)?.text()?;
